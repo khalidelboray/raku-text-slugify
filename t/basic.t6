@@ -1,0 +1,250 @@
+use Test;
+use Text::Slugify :ALL;
+
+subtest 'TESTING the smart-truncate subroutine' => {
+    subtest 'test smart truncate no max length' => {
+        my $txt = '1,000 reasons you are #1';
+        my $r = smart-truncate $txt;
+        is $r, $txt;
+    }
+
+    subtest 'test smart truncate no separator' => {
+        my $txt = '1,000 reasons you are #1';
+        my $r = smart-truncate $txt, :100max-length, :separator<_>;
+        is $r, $txt;
+    }
+}
+
+subtest 'TESTING the slugify subroutine' => {
+    subtest 'test extraneous separators' => {
+        my $txt = 'This is a test ---';
+        my $r = slugify($txt);
+        is $r, 'this-is-a-test';
+        
+        $txt = '___This is a test ---';
+        $r = slugify($txt);
+        is $r, 'this-is-a-test';
+        
+        $txt = '___This is a test___';
+        $r = slugify($txt);
+        is $r, 'this-is-a-test';
+    }
+    
+    subtest 'test non word characters' => {
+        my $txt = 'This -- is a ## test ---';
+        my $r = slugify $txt;
+        is $r, 'this-is-a-test';
+    }
+
+    # NWY
+    subtest 'test phonetic conversion of eastern scripts' => {
+        my $txt = '影師嗎';
+        my $r = slugify $txt;
+        is $r, 'ying-shi-ma';
+    }
+    
+    subtest 'test accented text' => {
+        my $txt = 'C\'est déjà l\'été.';
+        my $r = slugify $txt;
+        is $r, 'c-est-deja-l-ete';
+    
+        $txt = 'Nín hǎo. Wǒ shì zhōng guó rén';
+        $r = slugify $txt;
+        is $r, 'nin-hao-wo-shi-zhong-guo-ren';
+    }
+    
+    subtest 'test accented text with non word characters' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt;
+        is $r, 'jaja-lol-mememeoo-a';
+    }
+    
+    # NWY
+    subtest 'test cyrillic text' => {
+        my $txt = 'Компьютер';
+        my $r = slugify $txt;
+        is $r, 'kompiuter';
+    }
+    
+    subtest 'test max length' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt, max-length => 9;
+        is $r, 'jaja-lol';
+    
+        $txt = 'jaja---lol-méméméoo--a';
+        $r = slugify $txt, :15max-length;
+        #is $r, 'jaja-lol-mememe';
+    }
+    
+    subtest 'test max length cutoff not required' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt, :50max-length;
+        is $r, 'jaja-lol-mememeoo-a';
+    }
+    
+    subtest 'test word boundary' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt, :15max-length, :word-boundary;
+        is $r, 'jaja-lol-a';
+    
+        $txt = 'jaja---lol-méméméoo--a';
+        $r = slugify $txt, :17max-length, :word-boundary;
+        is $r, 'jaja-lol-mememeoo';
+    
+        $txt = 'jaja---lol-méméméoo--a';
+        $r = slugify $txt, :18max-length, :word-boundary;
+        is $r, 'jaja-lol-mememeoo';
+    
+        $txt = 'jaja---lol-méméméoo--a';
+        $r = slugify $txt, :19max-length, :word-boundary;
+        is $r, 'jaja-lol-mememeoo-a';
+    }
+    
+    subtest 'test custom separator' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt, :20max-length, :word-boundary, :separator<.>;
+        is $r, 'jaja.lol.mememeoo.a';
+    }
+    
+    subtest 'test multi character separator' => {
+        my $txt = 'jaja---lol-méméméoo--a';
+        my $r = slugify $txt, :20max-length, :word-boundary, :separator<ZZZZZZ>;
+        is $r, 'jajaZZZZZZlolZZZZZZmememeooZZZZZZa';
+    }
+    
+    subtest 'test save order' => {
+        my $txt = 'one two three four five';
+        my $r = slugify $txt, :13max-length, :word-boundary, :save-order;
+        is $r, 'one-two-three';
+    
+        $txt = 'one two three four five';
+        $r = slugify $txt, :13max-length, :word-boundary, :!save-order;
+        is $r, 'one-two-three';
+    
+        $txt = 'one two three four five';
+        $r = slugify $txt, :12max-length, :word-boundary, :!save-order;
+        is $r, 'one-two-four';
+    
+        $txt = 'one two three four five';
+        $r = slugify $txt, :12max-length, :word-boundary, :save-order;
+        is $r, 'one-two';
+    }
+    
+    subtest 'test stopword removal' => {
+        my $txt = 'this has a stopword';
+        my $r = slugify $txt, stopwords => ['stopword'];
+        is $r, 'this-has-a';
+    }
+    
+    subtest 'test stopword_removal_casesensitive' => {
+        my $txt = 'thIs Has a stopword Stopword';
+        my $r = slugify $txt, :stopwords['Stopword'], :!lowercase;
+        is $r, 'thIs-Has-a-stopword';
+    }
+    
+    subtest 'test multiple stopword occurances' => {
+        my $txt = 'the quick brown fox jumps over the lazy dog';
+        my $r = slugify $txt, :stopwords['the'];
+        is $r, 'quick-brown-fox-jumps-over-lazy-dog';
+    }
+    
+    subtest 'test differently cased stopword match' => {
+        my $txt = 'Foo A FOO B foo C';
+        my $r = slugify $txt, :stopwords['foo'];
+        is $r, 'a-b-c';
+    
+        $txt = 'Foo A FOO B foo C';
+        $r = slugify $txt, :stopwords['FOO'];
+        is $r, 'a-b-c';
+    }
+
+    subtest 'test multiple stopwords' => {
+        my $txt = 'the quick brown fox jumps over the lazy dog in a hurry';
+        my $r = slugify $txt, :stopwords['the', 'in', 'a', 'hurry'];
+        is $r, 'quick-brown-fox-jumps-over-lazy-dog';
+    }
+    
+    subtest 'test stopwords with different separator' => {
+        my $txt = 'the quick brown fox jumps over the lazy dog';
+        my $r = slugify $txt, :stopwords['the'], :separator(' ');
+        is $r, 'quick brown fox jumps over lazy dog';
+    }
+    
+    subtest 'test html entities' => {
+        my $txt = 'foo &amp; bar';
+        my $r = slugify $txt;
+        is $r, 'foo-bar';
+    }
+    
+    subtest 'test starts with number' => {
+        my $txt = '10 amazing secrets';
+        my $r = slugify $txt;
+        is $r, '10-amazing-secrets';
+    }
+
+    subtest 'test contains numbers' => {
+        my $txt = 'buildings with 1000 windows';
+        my $r = slugify $txt;
+        is $r, 'buildings-with-1000-windows';
+    }
+    
+    subtest 'test ends with number' => {
+        my $txt = 'recipe number 3';
+        my $r = slugify $txt;
+        is $r, 'recipe-number-3';
+    }
+
+    subtest 'test numbers only' => {
+        my $txt = '404';
+        my $r = slugify $txt;
+        is $r, '404';
+    }
+    
+    subtest 'test numbers and symbols' => {
+        my $txt = '1,000 reasons you are #1';
+        my $r = slugify $txt;
+        is $r, '1000-reasons-you-are-1';
+    }
+    
+    subtest 'test regex pattern keep underscore' => {
+        my $txt = '___This is a test___';
+        my $regex-pattern = rx« <-[ \- a..z 0..9 \_]>+ »;
+        my $r = slugify $txt, :$regex-pattern;
+        is $r, '___this-is-a-test___';
+    }
+    
+    subtest 'test replacements' => {
+        my $txt = '10 | 20 %';
+        my $r = slugify $txt, :replacements['|' => 'or', '%' => 'percent'];
+        is $r, '10-or-20-percent';
+    
+        $txt = 'I ♥ 🦄';
+        $r = slugify $txt, :replacements['♥' => 'amour', '🦄' => 'licorne'];
+        is $r, 'i-amour-licorne';
+    }
+
+    subtest 'test recurring replacements' => {
+        my $txt = '10 | 20 | 30 %';
+        my $r = slugify $txt, :replacements['|' => 'or', '%' => 'percent'];
+        is $r, '10-or-20-or-30-percent';
+    
+        $txt = 'Laurie ♥ Kel and Kel ♥ Laurie.';
+        $r = slugify $txt, :replacements['♥' => 'loves'];
+        is $r, 'laurie-loves-kel-and-kel-loves-laurie';
+    }
+
+    subtest 'test regex pattern keep underscore with underscore as separator' => {
+        =begin comment
+        The regex-pattern turns the power to the caller.
+        Hence the caller must ensure that a custom separator doesn't clash
+        with the regex-pattern.
+        =end comment
+
+        my $txt = '___This is a test___';
+        my $regex-pattern = rx« <-[ \- a..z 0..9 _ ]>+ »;
+        my $r = slugify $txt, :separator('_'), :$regex-pattern;
+        isnt $r, '_this_is_a_test_';
+    }
+}
+
+done-testing;

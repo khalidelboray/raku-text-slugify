@@ -1,0 +1,18 @@
+{
+    "perl" : "6.c",
+    "name" : "Text::Slugify",
+    "version" : "0.0.1",
+    "auth" : "gitlab:uzluisf",
+    "authors" : [ "Luis F. Uceta" ],
+    "description" : "A module to slugify strings.",
+    "license" : "",
+    "source-url" : "git://gitlab.com/uzluisf/raku-text-slugify.git",
+    "tags": ["slug", "text"],
+    "provides" : { 
+        "Text::Slugify" : "lib/Text/Slugify.pm6"
+    },
+    "resources" : [],
+    "depends" : [],
+    "build-depends" : [],
+    "test-depends" : [] 
+}

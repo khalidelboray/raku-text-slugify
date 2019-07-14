@@ -65,6 +65,13 @@ subtest 'TESTING the slugify subroutine' => {
         my $r = slugify $txt;
         is $r, 'kompyuter';
     }
+
+    subtest 'test longer cyrillic text' => {
+        my $txt = 'Часто и небо, и море синие.';
+        my $r = slugify $txt;
+        is $r, 'chasto-i-nebo-i-more-sinie';
+    }
+
     
     subtest 'test max length' => {
         my $txt = 'jaja---lol-méméméoo--a';

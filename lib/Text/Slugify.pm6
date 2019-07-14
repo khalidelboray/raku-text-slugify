@@ -190,7 +190,6 @@ sub slugify(
     return $text
 }
 
-
 sub char2ascii( $char ) {
 
     my %char-map = %(

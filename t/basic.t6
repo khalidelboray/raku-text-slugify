@@ -63,7 +63,7 @@ subtest 'TESTING the slugify subroutine' => {
     subtest 'test cyrillic text' => {
         my $txt = 'Компьютер';
         my $r = slugify $txt;
-        is $r, 'kompiuter';
+        is $r, 'kompyuter';
     }
     
     subtest 'test max length' => {

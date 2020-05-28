@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/khalidelboray/raku-text-slugify.svg?branch=master)](https://travis-ci.com/khalidelboray/raku-text-slugify)
+
 NAME
 ====
 
@@ -5,7 +7,7 @@ NAME
 
 `Text::Slugify` - create a URL slug from text. 
 
-[![Build Status](https://travis-ci.com/khalidelboray/raku-text-slugify.svg?branch=master)](https://travis-ci.com/khalidelboray/raku-text-slugify)
+
 
 SYNOPSIS
 ========

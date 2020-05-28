@@ -5,8 +5,8 @@
     "auth" : "github:khalidelboray",
     "authors" : [ "Khalid Elboray" ],
     "description" : "A module to slugify strings.",
-    "license" : "",
-    "source-url" : "git://github.com/khalidelboray/raku-text-slugify.git",
+    "license" : "Artistic-2.0",
+    "source-url" : "https://github.com/khalidelboray/raku-text-slugify.git",
     "tags": ["slug", "text","slugify"],
     "provides" : { 
         "Text::Slugify" : "lib/Text/Slugify.pm6"

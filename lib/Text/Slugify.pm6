@@ -10,7 +10,7 @@ my $DUPLICATE-DASH               = rx« '-' ** 2..* »;
 my $NUMBERS                      = rx« (<?after \d>) ',' (<?before \d>) »;
 my $DEFAULT-SEPARATOR            = '-';
 
-sub strip( $string is copy, $char ) is export {
+sub strip( $string is copy, $char ) is export(:ALL)  {
     =begin comment
     Trim string from both leading and trailing characters $char.
     Similar to .trim but for any characters.

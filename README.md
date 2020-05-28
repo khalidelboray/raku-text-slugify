@@ -62,6 +62,7 @@ The module exports the following subroutines:
 
 #### `slugify`
 
+```perl6
     sub slugify(
         Str:D $text is copy,            # Text to be slugified.
         Int:D :$max-length = 0,         # Output string length.
@@ -76,9 +77,11 @@ The module exports the following subroutines:
         Bool:D :$lowercase = True,      # Set case sensitivity by setting it to False.
         Bool:D :$save-order = False,    # If True and max-length > 0 return whole words in the initial order.
     )
+```
 
 #### `smart-truncate`
 
+```perl6
     sub smart-truncate(
         Str:D $string is rw,             # String to be modified.
         Int:D :$max-length = 0,          # Output string length.
@@ -86,8 +89,9 @@ The module exports the following subroutines:
         Str:D :$separator = " ",         # Separator between words.
         Bool:D :$save-order = False,     # Output text's word order same as input.
     )
+```
 
-**NOTE**: To import the subroutine `smart-truncate` alongside `slugify` into your code, use `use Text::Slugify :ALL`.
+**NOTE**: To import the subroutine `smart-truncate` or `strip` alongside `slugify` into your code, use `use Text::Slugify :ALL`.
 
 CREDIT-REFERENCE
 ================

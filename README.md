@@ -94,3 +94,4 @@ CREDIT-REFERENCE
 
 This module is mostly based on [Python Slugify](https://github.com/un33k/python-slugify).
 
+This is my fork of [https://gitlab.com/uzluisf/raku-text-slugify](https://gitlab.com/uzluisf/raku-text-slugify)

@@ -10,36 +10,17 @@ my $DUPLICATE-DASH               = rx« '-' ** 2..* »;
 my $NUMBERS                      = rx« (<?after \d>) ',' (<?before \d>) »;
 my $DEFAULT-SEPARATOR            = '-';
 
-sub strip( $string is copy, $char ) {
+sub strip( $string is copy, $char ) is export {
     =begin comment
     Trim string from both leading and trailing characters $char.
     Similar to .trim but for any characters.
-
-    NOTE TO SELF: There must be a cleaner P6-ish way but this'll do for now.
     =end comment
-
-    return $string unless $string.starts-with($char) ||
-                          $string.ends-with($char);
-
-    if $string.starts-with($char) {
-        my $pos = 0;
-        for $string.comb {
-            last if $char ne $_;
-            $pos += 1;
-        }
-        $string .= substr($pos, *);
+    # We are just looking for the text between the $char
+    if so $string ~~ /<!before $char> (.*)  <!after $char>/ {
+        return ~$0;
+    } else {
+        return $string;
     }
-
-    if $string.ends-with($char) {
-        my $pos = 0;
-        for $string.flip.comb {
-            last if $char ne $_;
-            $pos += 1;
-        }
-        $string .= substr(0, *-$pos);
-    }
-
-    return $string;
 }
 
 #| Truncate a string.
@@ -69,19 +50,17 @@ sub smart-truncate(
 
     my $truncated = '';
 
-    for $string.split($separator) -> $word {
-        if $word {
-            my $next-len = $truncated.chars + $word.chars;
-            if $next-len < $max-length {
-                $truncated ~= $word ~ $separator
-            }
-            elsif $next-len == $max-length {
-                $truncated ~= $word;
-                last;
-            }
-            else {
-                last if $save-order
-            }
+    for $string.split($separator,:skip-empty) -> $word {
+        my $next-len = $truncated.chars + $word.chars;
+        if $next-len < $max-length {
+            $truncated ~= $word ~ $separator
+        }
+        elsif $next-len == $max-length {
+            $truncated ~= $word;
+            last;
+        }
+        else {
+            last if $save-order
         }
     }
 
@@ -111,11 +90,7 @@ sub slugify(
 ) is export(:DEFAULT) {
 
     # do user-specific replacements.
-    for @replacements -> $replacement {
-        for $replacement.kv -> $old, $new {
-            $text .= subst: /$old/, $new, :g;
-        }
-    }
+    $text .= trans: @replacements>>.key => @replacements>>.value;
 
     # replace quotes with dashes.
     $text .= subst: $QUOTE, $DEFAULT-SEPARATOR, :g;
@@ -139,18 +114,15 @@ sub slugify(
     # make the text lowercase (optional).
     $text .= lc if $lowercase;
 
-    # remove quotes.
-    $text .= subst: $QUOTE, '', :g;
-
-    # get rid of commas in numbers.
-    $text .= subst: $NUMBERS, '', :g;
-
     # get pattern to replace unwanted characters.
     my $pattern = do if $lowercase { $regex-pattern // $ALLOWED-CHARS }
                      else { $regex-pattern // $ALLOWED-CHARS-WITH-UPPERCASE }
 
+    # remove quotes.
+    # get rid of commas in numbers.
     # apply substitution with pattern.
-    $text .= subst: $pattern, $DEFAULT-SEPARATOR, :g;
+
+    $text .= trans: [$QUOTE,$NUMBERS,$pattern] => ['','',$DEFAULT-SEPARATOR] ;
 
     # remove redundant dashes and strip away separator.
     $text = strip $text.subst($DUPLICATE-DASH, $DEFAULT-SEPARATOR, :g),
@@ -169,11 +141,7 @@ sub slugify(
     }
 
     # finalize user-specific replacements.
-    for @replacements -> $replacement {
-        for $replacement.kv -> $old, $new {
-            $text .= subst: /$old/, $new, :g;
-        }
-    }
+    $text .= trans: @replacements>>.key => @replacements>>.value;
 
     # smart truncate string if requested.
     if $max-length > 0 {

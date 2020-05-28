@@ -2,12 +2,12 @@
     "perl" : "6.c",
     "name" : "Text::Slugify",
     "version" : "0.0.1",
-    "auth" : "gitlab:uzluisf",
-    "authors" : [ "Luis F. Uceta" ],
+    "auth" : "github:khalidelboray",
+    "authors" : [ "Khalid Elboray" ],
     "description" : "A module to slugify strings.",
     "license" : "",
-    "source-url" : "git://gitlab.com/uzluisf/raku-text-slugify.git",
-    "tags": ["slug", "text"],
+    "source-url" : "git://github.com/khalidelboray/raku-text-slugify.git",
+    "tags": ["slug", "text","slugify"],
     "provides" : { 
         "Text::Slugify" : "lib/Text/Slugify.pm6"
     },

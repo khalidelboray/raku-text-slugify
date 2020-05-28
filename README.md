@@ -10,6 +10,7 @@ SYNOPSIS
 
 
 
+```perl6
     use Text::Slugify;
 
     my $txt;
@@ -25,6 +26,7 @@ SYNOPSIS
     $txt = 'jaja---lol-méméméoo--a';
     slugify $txt, :max-length(9);
     #=> «jaja-lol»
+```
 
 For more examples, have a look at the test file (`t/basic.t6`).
 
@@ -48,7 +50,7 @@ Using zef:
 From source:
 ------------
 
-    git clone git@gitlab.com:uzluisf/raku-text-slugify.git
+    git clone https://github.com/khalidelboray/raku-text-slugify.git
     cd raku-text-slugify && zef install .
 
 SUBROUTINES

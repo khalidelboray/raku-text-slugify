@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/khalidelboray/raku-text-slugify.svg?branch=master)](https://travis-ci.com/khalidelboray/raku-text-slugify)
+[![Build Status](https://travis-ci.org/khalidelboray/raku-text-slugify.svg?branch=master)](https://travis-ci.org/khalidelboray/raku-text-slugify)
 
 NAME
 ====
